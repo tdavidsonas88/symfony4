@@ -4,7 +4,7 @@
 namespace App\Services;
 
 
-class MySecondService
+class MySecondService implements ServiceInterface
 {
 
     /**
@@ -12,7 +12,7 @@ class MySecondService
      */
     public function __construct()
     {
-        dump('from second service');
+        dump('hello from second service!');
     }
 
     public function someMethod()

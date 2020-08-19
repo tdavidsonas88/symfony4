@@ -3,8 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Services\MyService;
-use Psr\Container\ContainerInterface;
+use App\Services\ServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,7 +21,7 @@ class DefaultController extends AbstractController
     /**
      * @Route("/page", name="default")
      */
-    public function index(Request $request, MyService $service)
+    public function index(Request $request, ServiceInterface $service)
     {
 
         $em = $this->getDoctrine()->getManager();
