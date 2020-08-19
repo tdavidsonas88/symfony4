@@ -2,10 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Author;
-use App\Entity\Pdf;
-use App\Services\GiftsService;
 use App\Services\MyService;
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,11 +21,11 @@ class DefaultController extends AbstractController
     /**
      * @Route("/page", name="default")
      */
-    public function index(Request $request, MyService $service)
+    public function index(Request $request, MyService $service, ContainerInterface $container)
     {
 
         $em = $this->getDoctrine()->getManager();
-        dump($service->secService->someMethod());
+        dump($container->get('app.myservice'));
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',

@@ -10,10 +10,10 @@ class MyService
     /**
      * MyService constructor.
      */
-    public function __construct($service)
+    public function __construct($one)
     {
-        dump($service);
-        $this->secService = $service;
+        dump('hi!');
+        dump($one);
     }
 
 }

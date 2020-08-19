@@ -35,13 +35,10 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    App\Controller\DefaultController:
-        bind:
-            $logger: '@monolog.logger.doctrine'
-
-    App\Services\MyService:
+    app.myservice:
+        class: App\Services\MyService
         arguments:
-            $service: '@App\Services\MySecondService'
+            $one: 'something'
+        public: true
 
-    App\Services\MySecondService:
-        lazy: true
+    App\Services\MyService: '@app.myservice'
