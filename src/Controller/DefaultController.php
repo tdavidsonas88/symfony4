@@ -27,6 +27,7 @@ class DefaultController extends AbstractController
     {
 
         $em = $this->getDoctrine()->getManager();
+        dump($service->secService->someMethod());
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
