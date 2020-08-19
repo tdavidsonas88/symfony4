@@ -39,11 +39,6 @@ services:
         bind:
             $logger: '@monolog.logger.doctrine'
 
-    App\Services\MySecondService:
-        class: App\Services\MySecondService
-
-
     App\Services\MyService:
-        arguments:
-            $secondService: '@App\Services\MySecondService'
+        autowire: true
 
