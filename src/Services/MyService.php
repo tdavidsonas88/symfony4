@@ -6,16 +6,13 @@ namespace App\Services;
 
 class MyService
 {
-    public $logger;
-    public $my;
 
     /**
      * MyService constructor.
      */
-    public function someAction()
+    public function __construct($service)
     {
-        dump($this->logger);
-        dump($this->my);
+        dump($service);
     }
 
 }
