@@ -10,11 +10,8 @@ class MyService
     /**
      * MyService constructor.
      */
-    public function __construct($param, $param2, $adminEmail, $globalParam)
+    public function __construct(MySecondService $secondService)
     {
-        dump($param);
-        dump($param2);
-        dump($adminEmail);
-        dump($globalParam);
+        dump($secondService);
     }
 }

@@ -39,8 +39,11 @@ services:
         bind:
             $logger: '@monolog.logger.doctrine'
 
+    App\Services\MySecondService:
+        class: App\Services\MySecondService
+
+
     App\Services\MyService:
         arguments:
-            $param: 'some parameter'
-            $param2: 'some parameter2'
-            $adminEmail: '%admin_email%'
+            $secondService: '@App\Services\MySecondService'
+
