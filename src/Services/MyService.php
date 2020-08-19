@@ -6,18 +6,16 @@ namespace App\Services;
 
 class MyService
 {
-
-    use OptionalServiceTrait;
+    public $logger;
+    public $my;
 
     /**
      * MyService constructor.
      */
-    public function __construct(MySecondService $secondService)
-    {
-    }
-
     public function someAction()
     {
-        dump($this->service->doSomething2());
+        dump($this->logger);
+        dump($this->my);
     }
+
 }
