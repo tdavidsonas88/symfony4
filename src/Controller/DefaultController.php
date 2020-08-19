@@ -27,6 +27,7 @@ class DefaultController extends AbstractController
     {
 
         $em = $this->getDoctrine()->getManager();
+        $service->someAction();
 
 
 
