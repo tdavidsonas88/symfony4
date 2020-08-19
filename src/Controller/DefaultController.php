@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Services\ServiceInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,12 +24,18 @@ class DefaultController extends AbstractController
      */
     public function index(Request $request, ServiceInterface $service)
     {
+        $cache = new FilesystemAdapter();
+        $posts = $cache->getItem('database.get_posts');
+        if (!$posts->isHit()) {
+            $posts_from_db = ['post 1', 'post 2', 'post 3'];
+            dump('connected with database ... ');
 
-        $em = $this->getDoctrine()->getManager();
-        $user = $em->getRepository(User::class)->find(1);
-        $user->setName('Rob');
-        $em->persist($user);
-        $em->flush();
+            $posts->set(serialize($posts_from_db));
+            $posts->expiresAfter(5);
+            $cache->save($posts);
+        }
+        $cache->deleteItem('database.get_posts');
+        dump(unserialize($posts->get()));
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',

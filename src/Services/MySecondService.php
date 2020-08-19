@@ -12,12 +12,6 @@ class MySecondService implements ServiceInterface
      */
     public function __construct()
     {
-        dump('hello from second service!');
-    }
-
-    public function someMethod()
-    {
-        return ' hello ! ';
     }
 
 }
