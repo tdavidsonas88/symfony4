@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Services\MyService;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
@@ -21,11 +22,14 @@ class DefaultController extends AbstractController
     /**
      * @Route("/page", name="default")
      */
-    public function index(Request $request, MyService $service, ContainerInterface $container)
+    public function index(Request $request, MyService $service)
     {
 
         $em = $this->getDoctrine()->getManager();
-        dump($container->get('app.myservice'));
+        $user = $em->getRepository(User::class)->find(1);
+        $user->setName('Rob');
+        $em->persist($user);
+        $em->flush();
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',

@@ -35,10 +35,7 @@ services:
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    app.myservice:
-        class: App\Services\MyService
-        arguments:
-            $one: 'something'
-        public: true
-
-    App\Services\MyService: '@app.myservice'
+    App\Services\MyService:
+        tags:
+            - { name: doctrine.event_listener, event: postFlush }
+            - { name: kernel.cache_clearer}
