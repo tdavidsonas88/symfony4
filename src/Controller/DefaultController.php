@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Video;
 use App\Events\VideoCreatedEvent;
+use App\Form\VideoFormType;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -23,18 +23,24 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/page", name="default")
+     * @Route("/home", name="default")
      */
     public function index(Request $request)
     {
-        $video = new \stdClass();
-        $video->title = 'Funny movie';
-        $video->category = 'funny';
-        $event = new VideoCreatedEvent($video);
-        $this->dispatcher->dispatch($event);
+        $video = new Video();
+//        $video->setTitle('Write a blog post');
+//        $video->setCreatedAt(new \DateTime('tomorrow'));
+
+        $form = $this->createForm(VideoFormType::class, $video);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            dump($form->getData());
+//            return $this->redirectToRoute('home');
+        }
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
+            'form' => $form->createView(),
         ]);
 
     }

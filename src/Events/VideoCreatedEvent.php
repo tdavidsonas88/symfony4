@@ -4,9 +4,10 @@
 namespace App\Events;
 
 
-use Laminas\EventManager\Event;
 
-class VideoCreatedEvent extends Event
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
+class VideoCreatedEvent extends EventDispatcher
 {
 
     /**

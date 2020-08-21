@@ -26,7 +26,11 @@
                 }}">templates/default/index.html.twig</a></code>
         </li>
     </ul>
-    {{ dump() }}
+{#    {{ form_start(form) }}#}
+{#    {{ form_widget(form) }}#}
+{#    {{ form_end(form) }}   #}
+    {{ form(form) }}
+
 </div>
 {% endblock %}
 {% block javascripts %}
