@@ -23,10 +23,13 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/home", name="default")
+     * @Route("/home", name="home")
      */
     public function index(Request $request)
     {
+        $em = $this->getDoctrine()->getManager();
+        $videos = $em->getRepository(Video::class)->findAll();
+        dump($videos);
         $video = new Video();
 //        $video->setTitle('Write a blog post');
 //        $video->setCreatedAt(new \DateTime('tomorrow'));
@@ -34,8 +37,9 @@ class DefaultController extends AbstractController
         $form = $this->createForm(VideoFormType::class, $video);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            dump($form->getData());
-//            return $this->redirectToRoute('home');
+            $em->persist($video);
+            $em->flush();
+            return $this->redirectToRoute('home');
         }
 
         return $this->render('default/index.html.twig', [
