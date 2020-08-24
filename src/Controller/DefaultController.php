@@ -38,6 +38,13 @@ class DefaultController extends AbstractController
         $form = $this->createForm(VideoFormType::class, $video);
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->get('file')->getData();
+            $fileName = sha1(random_bytes(14) . '.' . $file->guessExtension());
+            $file->move(
+                $this->getParameter('videos_directory'),
+                $fileName
+            );
+            $video->setFile($fileName);
             $em->persist($video);
             $em->flush();
             return $this->redirectToRoute('home');
