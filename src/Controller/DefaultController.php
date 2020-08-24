@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Video;
-use App\Events\VideoCreatedEvent;
 use App\Form\VideoFormType;
+use Exception;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Swift_Mailer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,35 +26,27 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/home", name="home")
+     * @param Request $request
+     * @param Swift_Mailer $mailer
+     * @return RedirectResponse|Response
+     * @throws Exception
      */
-    public function index(Request $request)
+    public function index(Request $request, Swift_Mailer $mailer)
     {
-        $em = $this->getDoctrine()->getManager();
-        $videos = $em->getRepository(Video::class)->findAll();
-        dump($videos);
-        $video = new Video();
-        $video->setTitle('Write a blog post');
-//        $video->setCreatedAt(new \DateTime('tomorrow'));
-//        $video = $em->getRepository(Video::class)->find(1);
-
-        $form = $this->createForm(VideoFormType::class, $video);
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $file = $form->get('file')->getData();
-            $fileName = sha1(random_bytes(14) . '.' . $file->guessExtension());
-            $file->move(
-                $this->getParameter('videos_directory'),
-                $fileName
+        $message = (new \Swift_Message('Hello Email'))
+            ->setFrom('send@example.com')
+            ->setTo('recipient@example.com')
+            ->setBody(
+                $this->renderView(
+                    'emails/registration.html.twig',
+                    array('name' => 'Robert')
+                ),
+                'text/html'
             );
-            $video->setFile($fileName);
-            $em->persist($video);
-            $em->flush();
-            return $this->redirectToRoute('home');
-        }
+        $mailer->send($message);
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
-            'form' => $form->createView(),
         ]);
 
     }
@@ -118,7 +112,7 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/redirect-test")
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse
      */
     public function redirectTest()
     {
