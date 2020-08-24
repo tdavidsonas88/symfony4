@@ -2,17 +2,17 @@
 
 namespace App\Controller;
 
-use App\Entity\Video;
-use App\Form\VideoFormType;
+use App\Entity\SecurityUser;
+use App\Form\RegisterUserType;
 use Exception;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Swift_Mailer;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class DefaultController extends AbstractController
 {
@@ -27,26 +27,34 @@ class DefaultController extends AbstractController
     /**
      * @Route("/home", name="home")
      * @param Request $request
-     * @param Swift_Mailer $mailer
+     * @param UserPasswordEncoderInterface $passwordEncoder
      * @return RedirectResponse|Response
-     * @throws Exception
      */
-    public function index(Request $request, Swift_Mailer $mailer)
+    public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
-        $message = (new \Swift_Message('Hello Email'))
-            ->setFrom('send@example.com')
-            ->setTo('recipient@example.com')
-            ->setBody(
-                $this->renderView(
-                    'emails/registration.html.twig',
-                    array('name' => 'Robert')
-                ),
-                'text/html'
+        $em = $this->getDoctrine()->getManager();
+        $users = $em->getRepository(SecurityUser::class)->findAll();
+        dump($users);
+
+        $user = new SecurityUser();
+        $form = $this->createForm(RegisterUserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setPassword(
+                $passwordEncoder->encodePassword($user, $form->get('password')->getData())
             );
-        $mailer->send($message);
+            $user->setEmail($form->get('email')->getData());
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+            return $this->redirectToRoute('home');
+        }
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
+            'form' => $form->createView(),
         ]);
 
     }
