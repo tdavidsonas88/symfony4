@@ -41,7 +41,7 @@ class Video extends File
 
     /**
      * @Assert\NotBlank()
-     * @Assert\DateTime()
+     * @Assert\Type("\DateTimeInterface")
      * @ORM\Column(type="datetime")
      */
     private $created_at;
