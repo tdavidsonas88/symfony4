@@ -28,13 +28,13 @@ class DefaultController extends AbstractController
 
     /**
      * @Route("/home/{id}/delete-video", name="home")
-     * @Security("user.getId() == video.getSecurityUser().getId()")
+     * @Security("has_role('ROLE_ADMIN')")
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return RedirectResponse|Response
      */
     public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder,
-        Video $video)
+                          Video $video)
     {
         $em = $this->getDoctrine()->getManager();
         $users = $em->getRepository(SecurityUser::class)->findAll();
