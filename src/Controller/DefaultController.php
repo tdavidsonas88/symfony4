@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\SecurityUser;
+use App\Entity\Video;
 use App\Form\RegisterUserType;
-use Exception;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -38,24 +38,26 @@ class DefaultController extends AbstractController
         dump($users);
 
         $user = new SecurityUser();
-        $form = $this->createForm(RegisterUserType::class, $user);
-        $form->handleRequest($request);
+        $user->setEmail('admin@admin.com');
+        $password = $passwordEncoder->encodePassword($user, 'passwd');
+        $user->setPassword($password);
+        $user->setRoles(['ROLE_ADMIN']);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user->setPassword(
-                $passwordEncoder->encodePassword($user, $form->get('password')->getData())
-            );
-            $user->setEmail($form->get('email')->getData());
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->flush();
+        $video = new Video();
+        $video->setTitle('video title');
+        $video->setFile('video path');
+        $video->setCreatedAt(new \DateTime());
+        $em->persist($video);
 
-            return $this->redirectToRoute('home');
-        }
+        $user->addVideo($video);
+        $em->persist($user);
+        $em->flush();
+
+        dump($user->getId());
+        dump($video->getId());
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
-            'form' => $form->createView(),
         ]);
 
     }
