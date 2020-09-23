@@ -6,6 +6,7 @@ use App\Entity\SecurityUser;
 use App\Entity\Video;
 use App\Form\RegisterUserType;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,35 +27,19 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/home", name="home")
+     * @Route("/home/{id}/delete-video", name="home")
+     * @Security("user.getId() == video.getSecurityUser().getId()")
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return RedirectResponse|Response
      */
-    public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder,
+        Video $video)
     {
         $em = $this->getDoctrine()->getManager();
         $users = $em->getRepository(SecurityUser::class)->findAll();
         dump($users);
-
-        $user = new SecurityUser();
-        $user->setEmail('admin@admin.com');
-        $password = $passwordEncoder->encodePassword($user, 'passwd');
-        $user->setPassword($password);
-        $user->setRoles(['ROLE_ADMIN']);
-
-        $video = new Video();
-        $video->setTitle('video title');
-        $video->setFile('video path');
-        $video->setCreatedAt(new \DateTime());
-        $em->persist($video);
-
-        $user->addVideo($video);
-        $em->persist($user);
-        $em->flush();
-
-        dump($user->getId());
-        dump($video->getId());
+        dump($video);
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
