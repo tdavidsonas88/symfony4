@@ -2,11 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\SecurityUser;
 use App\Entity\Video;
-use App\Form\RegisterUserType;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,12 +31,11 @@ class DefaultController extends AbstractController
      */
     public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
-//        $em = $this->getDoctrine()->getManager();
-//        $users = $em->getRepository(SecurityUser::class)->findAll();
+        $em = $this->getDoctrine()->getManager();
+        $video = $em->getRepository(Video::class)->find(1);
 //        dump($users);
-//        dump($video);
 
-        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+        $this->denyAccessUnlessGranted('VIDEO_DELETE', $video);
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
