@@ -32,10 +32,6 @@ class DefaultController extends AbstractController
     public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
         $em = $this->getDoctrine()->getManager();
-        $video = $em->getRepository(Video::class)->find(1);
-//        dump($users);
-
-        $this->denyAccessUnlessGranted('VIDEO_DELETE', $video);
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
