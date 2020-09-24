@@ -28,5 +28,19 @@ class DefaultControllerTest extends WebTestCase
             'the "Content-Type" header is "application/json"'  // optional message shown on failure
         );
         $this->assertContains('This friendly message', $client->getResponse()->getContent());
+
+    }
+
+    public function testClickingTheLink()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/home');
+
+        $link = $crawler
+            ->filter('a:contains("awesome link")')
+            ->link();
+
+        $crawler = $client->click($link);
+        $this->assertContains('Remember me', $client->getResponse()->getContent());
     }
 }
