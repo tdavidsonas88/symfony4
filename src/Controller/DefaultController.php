@@ -27,19 +27,19 @@ class DefaultController extends AbstractController
     }
 
     /**
-     * @Route("/home/{id}/delete-video", name="home")
-     * @Security("has_role('ROLE_ADMIN')")
+     * @Route("/home", name="home")
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
      * @return RedirectResponse|Response
      */
-    public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder,
-                          Video $video)
+    public function index(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
-        $em = $this->getDoctrine()->getManager();
-        $users = $em->getRepository(SecurityUser::class)->findAll();
-        dump($users);
-        dump($video);
+//        $em = $this->getDoctrine()->getManager();
+//        $users = $em->getRepository(SecurityUser::class)->findAll();
+//        dump($users);
+//        dump($video);
+
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
 
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
