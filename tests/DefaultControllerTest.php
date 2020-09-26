@@ -43,4 +43,18 @@ class DefaultControllerTest extends WebTestCase
         $crawler = $client->click($link);
         $this->assertContains('Remember me', $client->getResponse()->getContent());
     }
+
+    public function testSendingForm()
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/login');
+
+        $form = $crawler->selectButton('Sign in')->form();
+        $form['email'] = 'user@user.com';
+        $form['password'] = 'passwd';
+
+        $crawler = $client->submit($form);
+        $crawler = $client->followRedirect();
+        $this->assertEquals(1, $crawler->filter('a:contains("logout")')->count());
+    }
 }
