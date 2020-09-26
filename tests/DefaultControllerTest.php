@@ -2,6 +2,7 @@
 
 namespace App\Tests;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DefaultControllerTest extends WebTestCase
@@ -56,5 +57,24 @@ class DefaultControllerTest extends WebTestCase
         $crawler = $client->submit($form);
         $crawler = $client->followRedirect();
         $this->assertEquals(1, $crawler->filter('a:contains("logout")')->count());
+    }
+
+    /**
+     * @dataProvider provideUrls
+     */
+    public function testDataProviders($url)
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/home');
+
+        $this->assertTrue($client->getResponse()->isSuccessful());
+    }
+
+    public function provideUrls()
+    {
+        return [
+            ['/home'],
+            ['/login']
+        ];
     }
 }
