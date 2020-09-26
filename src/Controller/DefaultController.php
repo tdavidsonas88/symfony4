@@ -33,6 +33,9 @@ class DefaultController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
 
+        $videos = $em->getRepository(Video::class)->findAll();
+        dump($videos);
+
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
         ]);

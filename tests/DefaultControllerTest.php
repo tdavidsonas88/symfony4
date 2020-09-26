@@ -2,17 +2,44 @@
 
 namespace App\Tests;
 
+use App\Entity\Video;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\ORMException;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DefaultControllerTest extends WebTestCase
 {
+    /**
+     * @var EntityManager
+     */
+    private $em;
+
+    /** @var KernelBrowser  */
+    private $client;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->client = static::createClient();
+
+        $this->em = $this->client->getContainer()->get('doctrine.orm.entity_manager');
+        $this->em->beginTransaction();
+        $this->em->getConnection()->setAutoCommit(false);
+    }
+
+    protected function tearDown() : void
+    {
+        $this->em->rollback();
+        $this->em->close();
+        $this->em = null; // to avoid memory leaks
+    }
+
     public function testSomething()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/home');
+        $crawler = $this->client->request('GET', '/home');
 
-        $this->assertSame(200, $client->getResponse()->getStatusCode());
+        $this->assertSame(200, $this->client->getResponse()->getStatusCode());
         $this->assertSelectorTextContains('h1', 'Hello');
 
         $this->assertGreaterThan(
@@ -22,40 +49,38 @@ class DefaultControllerTest extends WebTestCase
 //        $this->assertGreaterThan(0, $crawler->filter('h1.class')->count());
         $this->assertCount(1, $crawler->filter('h1'));
         $this->assertTrue(
-            $client->getResponse()->headers->contains(
+            $this->client->getResponse()->headers->contains(
                 'Content-Type',
                 'text/html; charset=UTF-8'
             ),
             'the "Content-Type" header is "application/json"'  // optional message shown on failure
         );
-        $this->assertContains('This friendly message', $client->getResponse()->getContent());
+        $this->assertContains('This friendly message', $this->client->getResponse()->getContent());
 
     }
 
     public function testClickingTheLink()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/home');
+        $crawler = $this->client->request('GET', '/home');
 
         $link = $crawler
             ->filter('a:contains("awesome link")')
             ->link();
 
-        $crawler = $client->click($link);
-        $this->assertContains('Remember me', $client->getResponse()->getContent());
+        $crawler = $this->client->click($link);
+        $this->assertContains('Remember me', $this->client->getResponse()->getContent());
     }
 
     public function testSendingForm()
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/login');
+        $crawler = $this->client->request('GET', '/login');
 
         $form = $crawler->selectButton('Sign in')->form();
         $form['email'] = 'user@user.com';
         $form['password'] = 'passwd';
 
-        $crawler = $client->submit($form);
-        $crawler = $client->followRedirect();
+        $crawler = $this->client->submit($form);
+        $crawler = $this->client->followRedirect();
         $this->assertEquals(1, $crawler->filter('a:contains("logout")')->count());
     }
 
@@ -64,10 +89,9 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testDataProviders($url)
     {
-        $client = static::createClient();
-        $crawler = $client->request('GET', '/home');
+        $crawler = $this->client->request('GET', '/home');
 
-        $this->assertTrue($client->getResponse()->isSuccessful());
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
     }
 
     public function provideUrls()
@@ -76,5 +100,22 @@ class DefaultControllerTest extends WebTestCase
             ['/home'],
             ['/login']
         ];
+    }
+
+    /**
+     * @throws ORMException
+     */
+    public function findVideo()
+    {
+        $crawler = $this->client->request('GET', '/home');
+        $this->assertTrue($this->client->getResponse()->isSuccessful());
+
+        $video = $this->em->getRepository(Video::class)->find(1);
+        $this->em->remove($video);
+        $this->em->flush();
+
+        $this->assertNull($this->em
+            ->getRepository(Video::class)
+            ->find(1));
     }
 }
